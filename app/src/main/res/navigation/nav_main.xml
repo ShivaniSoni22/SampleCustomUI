@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_main"
+    app:startDestination="@id/customUiFragment">
+
+    <fragment
+        android:id="@+id/customUiFragment"
+        android:name="com.sample.samplecustomui.ui.fragment.CustomUiFragment"
+        android:label="CustomUiFragment" >
+        <action
+            android:id="@+id/action_customUiFragment_to_bottomSheetFragment"
+            app:destination="@id/bottomSheetFragment" />
+        <argument
+            android:name="isAnimationVisible"
+            app:argType="boolean"
+            android:defaultValue="true" />
+        <argument
+            android:name="isCustomUiVisible"
+            app:argType="boolean"
+            android:defaultValue="false" />
+    </fragment>
+    <fragment
+        android:id="@+id/bottomSheetFragment"
+        android:name="com.sample.samplecustomui.ui.fragment.DetailsFragment"
+        android:label="BottomSheetFragment">
+        <argument
+            android:name="name"
+            app:argType="string" />
+        <argument
+            android:name="mobileNumber"
+            app:argType="string" />
+        <argument
+            android:name="city"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_bottomSheetFragment_to_customUiFragment"
+            app:destination="@id/customUiFragment" />
+    </fragment>
+</navigation>
