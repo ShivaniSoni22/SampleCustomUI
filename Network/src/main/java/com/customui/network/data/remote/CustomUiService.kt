@@ -14,47 +14,68 @@ import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 
 interface CustomUiService {
-    suspend fun getCustomUi(): List<CustomUiResponse>
-//    suspend fun createPost(postRequest: PostRequest): PostResponse?
+
+    suspend fun getCustomUi(): CustomUiResponse
 
     companion object {
         fun create(): CustomUiService {
             return CustomUiServiceImpl(
                 client = HttpClient(Android) {
                     // Logging
-                    install(Logging) {
-                        logger = object : Logger {
-                            override fun log(message: String) {
-                                Log.v("Logger Ktor =>", message)
-                            }
-                        }
-                        level = LogLevel.ALL
-                    }
+                    setUpLogging()
                     // JSON
-                    install(ContentNegotiation) {
-                        json(Json {
-                            ignoreUnknownKeys = true
-                            isLenient = true
-                            encodeDefaults = false
-                        })
-                    }
+                    setUpContentNegotiation()
                     // Timeout
-                    install(HttpTimeout) {
-                        requestTimeoutMillis = 30000L
-                        connectTimeoutMillis = 30000L
-                        socketTimeoutMillis = 30000L
-                    }
+                    setUpTimeout()
                     // Apply to all requests
-                    install(DefaultRequest) {
-                        header(HttpHeaders.ContentType, ContentType.Application.Json)
-                    }
-                    install(ResponseObserver) {
-                        onResponse { response ->
-                            Log.d("HTTP status:", "${response.status.value}")
-                        }
-                    }
+                    setUpHeader()
+                    //Observer
+                    setUpObserver()
                 }
             )
+        }
+
+        private fun HttpClientConfig<AndroidEngineConfig>.setUpContentNegotiation() {
+            install(ContentNegotiation) {
+                json(Json {
+                    ignoreUnknownKeys = true
+                    isLenient = true
+                    encodeDefaults = false
+                })
+            }
+        }
+
+        private fun HttpClientConfig<AndroidEngineConfig>.setUpLogging() {
+            install(Logging) {
+                logger = object : Logger {
+                    override fun log(message: String) {
+                        Log.v("Logger Ktor =>", message)
+                    }
+                }
+                level = LogLevel.ALL
+            }
+        }
+
+        private fun HttpClientConfig<AndroidEngineConfig>.setUpObserver() {
+            install(ResponseObserver) {
+                onResponse { response ->
+                    Log.d("HTTP status:", "${response.status.value}")
+                }
+            }
+        }
+
+        private fun HttpClientConfig<AndroidEngineConfig>.setUpHeader() {
+            install(DefaultRequest) {
+                header(HttpHeaders.ContentType, ContentType.Application.Json)
+            }
+        }
+
+        private fun HttpClientConfig<AndroidEngineConfig>.setUpTimeout() {
+            install(HttpTimeout) {
+                requestTimeoutMillis = 60000L
+                connectTimeoutMillis = 60000L
+                socketTimeoutMillis = 60000L
+            }
         }
     }
 }
